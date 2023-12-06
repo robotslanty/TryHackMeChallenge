@@ -1,0 +1,2 @@
+export const JWT_SECRET_NAME = 'JWT_SECRET';
+export const JWT_EXPIRES_IN_NAME = 'JWT_EXPIRES_IN';

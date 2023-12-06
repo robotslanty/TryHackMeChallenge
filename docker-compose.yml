@@ -1,0 +1,18 @@
+version: '3'
+services:
+    mongo-dev:
+        image: mongo:latest
+        ports:
+            - 27017:27017
+        networks:
+            - try-hack-me
+
+    mongo-test:
+        image: mongo:latest
+        ports:
+            - 27018:27017
+        networks:
+            - try-hack-me
+
+networks:
+    try-hack-me:
