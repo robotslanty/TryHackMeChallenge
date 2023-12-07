@@ -186,6 +186,13 @@ describe('TryHackMe Challenge e2e', () => {
     });
 
     describe('Tasks', () => {
+        const addTaskDto: AddTaskDto = {
+            title: 'Test Task Title',
+            description: 'This is my test task',
+            status: TaskStatus.OPEN,
+            createdAt: new Date(),
+        };
+
         const path = '/tasks';
         const accessToken = pactum.stash.getStoreKey('accessToken');
 
@@ -205,21 +212,14 @@ describe('TryHackMe Challenge e2e', () => {
         });
 
         describe('create task', () => {
-            const dto: AddTaskDto = {
-                title: 'Test Task Title',
-                description: 'This is my test task',
-                status: TaskStatus.OPEN,
-                createdAt: new Date(),
-            };
-
             it('should create and return a task for the current user', () => {
                 return pactum
                     .spec()
                     .post(path)
                     .withBearerToken(accessToken)
-                    .withBody(dto)
+                    .withBody(addTaskDto)
                     .expectStatus(201)
-                    .expectBodyContains(dto.title);
+                    .expectBodyContains(addTaskDto.title);
             });
 
             it('should create a task for the current user with a due date', () => {
@@ -228,7 +228,7 @@ describe('TryHackMe Challenge e2e', () => {
                     .spec()
                     .post(path)
                     .withBearerToken(accessToken)
-                    .withBody({ dueAt, ...dto })
+                    .withBody({ dueAt, ...addTaskDto })
                     .expectStatus(201)
                     .expectBodyContains(dueAt);
             });
@@ -268,7 +268,7 @@ describe('TryHackMe Challenge e2e', () => {
         });
 
         describe('edit task', () => {
-            const dto: EditTaskDto = {
+            const editTaskDto: EditTaskDto = {
                 title: 'Updated Test Task Title',
             };
 
@@ -277,9 +277,9 @@ describe('TryHackMe Challenge e2e', () => {
                     .spec()
                     .patch(`${path}/$S{taskId}`)
                     .withBearerToken(accessToken)
-                    .withBody(dto)
+                    .withBody(editTaskDto)
                     .expectStatus(200)
-                    .expectBodyContains(dto.title);
+                    .expectBodyContains(editTaskDto.title);
             });
 
             it('throw if the task does not exist', () => {
@@ -287,7 +287,7 @@ describe('TryHackMe Challenge e2e', () => {
                     .spec()
                     .patch(`${path}/${invalidTaskId}`)
                     .withBearerToken(accessToken)
-                    .withBody(dto)
+                    .withBody(editTaskDto)
                     .expectStatus(404);
             });
         });
@@ -318,6 +318,60 @@ describe('TryHackMe Challenge e2e', () => {
                     .get(`${path}/$S{taskId}`)
                     .withBearerToken(accessToken)
                     .expectStatus(404);
+            });
+        });
+
+        describe('pagination', () => {
+            const path = '/tasks';
+
+            it('should add 20 tasks', async () => {
+                for (let i = 1; i <= 20; i++) {
+                    await pactum
+                        .spec()
+                        .post(path)
+                        .withBearerToken(accessToken)
+                        .withBody({ ...addTaskDto, ...{ title: `Task ${i}` } })
+                        .expectStatus(201)
+                        .expectBodyContains(`Task ${i}`);
+                }
+            });
+
+            it('should get the first 10 tasks', () => {
+                return pactum
+                    .spec()
+                    .get(path)
+                    .withBearerToken(accessToken)
+                    .expectStatus(200)
+                    .expectJsonLength(10)
+                    .expectBodyContains('Task 1');
+            });
+
+            it('should get the first 5 tasks', () => {
+                const urlParams = new URLSearchParams();
+                urlParams.append('limit', '5');
+
+                return pactum
+                    .spec()
+                    .get(`${path}?${urlParams.toString()}`)
+                    .withBearerToken(accessToken)
+                    .expectStatus(200)
+                    .expectJsonLength(5)
+                    .expectBodyContains('Task 1');
+            });
+
+            it('should get the next 5 tasks', () => {
+                const urlParams = new URLSearchParams();
+                urlParams.append('limit', '5');
+                urlParams.append('skip', '5');
+
+                return pactum
+                    .spec()
+                    .get(`${path}?${urlParams.toString()}`)
+                    .withBearerToken(accessToken)
+                    .expectStatus(200)
+                    .expectJsonLength(5)
+                    .expectBodyContains('Task 6')
+                    .inspect();
             });
         });
     });

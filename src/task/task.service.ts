@@ -4,13 +4,14 @@ import { Model } from 'mongoose';
 import { Task } from './schemas/task.schema';
 import { AddTaskDto } from './dto/add-task.dto';
 import { EditTaskDto } from './dto/edit-task.dto';
+import { GetTasksOptions } from './dto/get-tasks-options.dto';
 
 @Injectable()
 export class TaskService {
     constructor(@InjectModel(Task.name) private taskModel: Model<Task>) {}
 
-    getTasks(userId: string) {
-        return this.taskModel.find({ userId });
+    getTasks(userId: string, options: GetTasksOptions = { limit: 10, skip: 0 }) {
+        return this.taskModel.find({ userId }, null, options);
     }
 
     async getTaskById(userId: string, taskId: string) {
