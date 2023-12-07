@@ -2,7 +2,7 @@
 
 ## Synopsis
 
-A full-stack web application for managing tasks.
+An REST API for managing tasks.
 
 -   REST API using NestJS on top of Express
 -   User authentication is performed using JWT
@@ -10,6 +10,11 @@ A full-stack web application for managing tasks.
 -   Suite of e2e tests
 
 The API solution is roughly based on a NestJS tutorial I followed sometime ago when I was first learning the framework, it's available here: https://www.youtube.com/watch?v=GHTA143_b-s
+
+## Todo
+
+-   Implement search
+-   Implement sorting
 
 ## Installation
 
