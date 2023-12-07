@@ -14,6 +14,7 @@ export class TaskService {
         return {
             tasks: await this.taskModel.find({ userId }, null, options),
             count: await this.taskModel.countDocuments(),
+            ...options,
         };
     }
 

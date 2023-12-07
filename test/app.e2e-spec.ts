@@ -200,13 +200,16 @@ describe('TryHackMe Challenge e2e', () => {
                 return pactum.spec().get(path).expectStatus(401);
             });
 
-            it('should return an array with zero length', () => {
+            it('should return zero tasks', () => {
                 return pactum
                     .spec()
                     .get(path)
                     .withBearerToken(accessToken)
                     .expectStatus(200)
-                    .expectJson({ tasks: [], count: 0 });
+                    .expectJson('count', 0)
+                    .expectJson('skip', 0)
+                    .expectJson('limit', 10)
+                    .expectJsonLength('tasks', 0);
             });
         });
 
@@ -344,6 +347,8 @@ describe('TryHackMe Challenge e2e', () => {
                     .expectStatus(200)
                     .expectJsonLength('tasks', 10)
                     .expectJson('count', 21)
+                    .expectJson('skip', 0)
+                    .expectJson('limit', 10)
                     .expectBodyContains('Task 1');
             });
 
@@ -358,6 +363,8 @@ describe('TryHackMe Challenge e2e', () => {
                     .expectStatus(200)
                     .expectJsonLength('tasks', 5)
                     .expectJson('count', 21)
+                    .expectJson('skip', 0)
+                    .expectJson('limit', 5)
                     .expectBodyContains('Task 1');
             });
 
@@ -373,6 +380,8 @@ describe('TryHackMe Challenge e2e', () => {
                     .expectStatus(200)
                     .expectJsonLength('tasks', 5)
                     .expectJson('count', 21)
+                    .expectJson('skip', 5)
+                    .expectJson('limit', 5)
                     .expectBodyContains('Task 6')
                     .inspect();
             });
