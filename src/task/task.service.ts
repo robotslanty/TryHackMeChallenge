@@ -10,8 +10,11 @@ import { GetTasksOptions } from './dto/get-tasks-options.dto';
 export class TaskService {
     constructor(@InjectModel(Task.name) private taskModel: Model<Task>) {}
 
-    getTasks(userId: string, options: GetTasksOptions = { limit: 10, skip: 0 }) {
-        return this.taskModel.find({ userId }, null, options);
+    async getTasks(userId: string, options: GetTasksOptions = { limit: 10, skip: 0 }) {
+        return {
+            tasks: await this.taskModel.find({ userId }, null, options),
+            count: await this.taskModel.countDocuments(),
+        };
     }
 
     async getTaskById(userId: string, taskId: string) {
@@ -29,6 +32,7 @@ export class TaskService {
 
     addTask(userId: string, dto: AddTaskDto) {
         const task = new this.taskModel({ userId, ...dto });
+        task.createdAt = new Date();
         return task.save();
     }
 

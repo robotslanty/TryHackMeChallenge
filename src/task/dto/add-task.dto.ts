@@ -15,8 +15,4 @@ export class AddTaskDto {
     @IsDateString()
     @IsOptional()
     dueAt?: Date;
-
-    @IsDateString()
-    @IsNotEmpty()
-    createdAt: Date;
 }

@@ -190,7 +190,6 @@ describe('TryHackMe Challenge e2e', () => {
             title: 'Test Task Title',
             description: 'This is my test task',
             status: TaskStatus.OPEN,
-            createdAt: new Date(),
         };
 
         const path = '/tasks';
@@ -207,7 +206,7 @@ describe('TryHackMe Challenge e2e', () => {
                     .get(path)
                     .withBearerToken(accessToken)
                     .expectStatus(200)
-                    .expectJsonLength(0);
+                    .expectJson({ tasks: [], count: 0 });
             });
         });
 
@@ -241,8 +240,9 @@ describe('TryHackMe Challenge e2e', () => {
                     .get(path)
                     .withBearerToken(accessToken)
                     .expectStatus(200)
-                    .expectJsonLength(2)
-                    .stores('taskId', '[0]._id');
+                    .expectJson('count', 2)
+                    .expectJsonLength('tasks', 2)
+                    .stores('taskId', 'tasks[0]._id');
             });
         });
 
@@ -342,7 +342,8 @@ describe('TryHackMe Challenge e2e', () => {
                     .get(path)
                     .withBearerToken(accessToken)
                     .expectStatus(200)
-                    .expectJsonLength(10)
+                    .expectJsonLength('tasks', 10)
+                    .expectJson('count', 21)
                     .expectBodyContains('Task 1');
             });
 
@@ -355,7 +356,8 @@ describe('TryHackMe Challenge e2e', () => {
                     .get(`${path}?${urlParams.toString()}`)
                     .withBearerToken(accessToken)
                     .expectStatus(200)
-                    .expectJsonLength(5)
+                    .expectJsonLength('tasks', 5)
+                    .expectJson('count', 21)
                     .expectBodyContains('Task 1');
             });
 
@@ -369,7 +371,8 @@ describe('TryHackMe Challenge e2e', () => {
                     .get(`${path}?${urlParams.toString()}`)
                     .withBearerToken(accessToken)
                     .expectStatus(200)
-                    .expectJsonLength(5)
+                    .expectJsonLength('tasks', 5)
+                    .expectJson('count', 21)
                     .expectBodyContains('Task 6')
                     .inspect();
             });
